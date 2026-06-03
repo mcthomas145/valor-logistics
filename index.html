@@ -573,7 +573,7 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
         </div>
         <div class="ci">
           <div class="cico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 6l8 6 8-6"/></svg></div>
-          <div><div class="label">Email</div><div class="val">info@auxegenfund.com</div></div>
+          <div><div class="label">Email</div><div class="val">info@haulvalor.com</div></div>
         </div>
         <div class="ci">
           <div class="cico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
@@ -605,11 +605,12 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
         <div class="field"><label for="msg">Anything else we should know?</label><textarea id="msg" name="msg" placeholder="Tell us a bit about what you're looking for…"></textarea></div>
         <button type="submit" class="btn btn-primary">Submit Application <span class="arr">→</span></button>
         <p class="form-note">By submitting, you agree to be contacted by Valor Logistics about the lease purchase program.</p>
+        <p class="form-note" id="formError" style="display:none;color:#ff8a8a">Something went wrong sending your message. Please email us directly at info@haulvalor.com or call (317) 516-0653.</p>
       </form>
       <div class="form-success" id="formSuccess">
         <div class="ck"><svg width="28" height="28" fill="none" stroke="var(--blue-light)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
         <h3 style="font-size:1.4rem;margin-bottom:8px">Thanks — we got it!</h3>
-        <p style="color:var(--muted)">Your email app should open with your details ready to send. We'll be in touch soon.</p>
+        <p style="color:var(--muted)">Your message has been sent to our team. We'll be in touch soon.</p>
       </div>
     </div>
   </div>
@@ -648,7 +649,7 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
         <h4>Get In Touch</h4>
         <a href="https://intelliapp.driverapponline.com/c/awltransport?uri_b=ia_awltransport_2084954392" target="_blank" rel="noopener noreferrer">Apply Now</a>
         <a href="tel:+13175160653">(317) 516-0653</a>
-        <a href="mailto:info@auxegenfund.com">info@auxegenfund.com</a>
+        <a href="mailto:info@haulvalor.com">info@haulvalor.com</a>
       </div>
     </div>
     <div class="foot-bottom">
@@ -723,25 +724,39 @@ document.getElementById('lbClose').addEventListener('click', closeLightbox);
 lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
-// form -> opens email with details (no backend needed).
-// To use a real form service instead, replace this handler with a Formspree/Netlify form action.
+// contact form -> sends submission to info@haulvalor.com via FormSubmit (no backend needed)
 document.getElementById('leadForm').addEventListener('submit', function(e){
   e.preventDefault();
   const f = e.target;
-  const body =
-`New lease purchase inquiry — Valor Logistics
+  const btn = f.querySelector('button[type="submit"], .btn');
+  const btnText = btn ? btn.innerHTML : '';
+  if (btn){ btn.disabled = true; btn.innerHTML = 'Sending…'; }
 
-Name: ${f.fname.value} ${f.lname.value}
-Phone: ${f.phone.value}
-Email: ${f.email.value}
-Experience: ${f.exp.value || 'Not specified'}
+  const payload = {
+    Name: `${f.fname.value} ${f.lname.value}`.trim(),
+    Phone: f.phone.value,
+    Email: f.email.value,
+    Experience: f.exp.value || 'Not specified',
+    Message: f.msg.value || '(none)',
+    _subject: 'New Lease Purchase Inquiry — Valor Logistics',
+    _template: 'table'
+  };
 
-Message:
-${f.msg.value || '(none)'}`;
-  const to = 'info@auxegenfund.com';
-  window.location.href = `mailto:${to}?subject=${encodeURIComponent('New Lease Purchase Inquiry')}&body=${encodeURIComponent(body)}`;
-  f.style.display = 'none';
-  document.getElementById('formSuccess').classList.add('show');
+  fetch('https://formsubmit.co/ajax/info@haulvalor.com', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(() => {
+    f.style.display = 'none';
+    document.getElementById('formSuccess').classList.add('show');
+  })
+  .catch(() => {
+    if (btn){ btn.disabled = false; btn.innerHTML = btnText; }
+    const err = document.getElementById('formError');
+    if (err) err.style.display = 'block';
+  });
 });
 </script>
 </body>
