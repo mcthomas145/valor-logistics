@@ -407,6 +407,7 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
       <a href="#contact">Contact</a>
     </nav>
     <div class="nav-cta">
+      <a id="signinBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">Sign In</a>
       <a href="https://intelliapp.driverapponline.com/c/awltransport?uri_b=ia_awltransport_2084954392" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">Apply Now</a>
       <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
@@ -913,7 +914,16 @@ document.getElementById('leadForm').addEventListener('submit', function(e){
 // >>> ONE STEP TO GO LIVE: replace YOUR-WORKER-URL below with your real Worker host
 //     (e.g. valor-logistics.<you>.workers.dev, or app.haulvalor.com if you add a custom domain).
 //     Until you do, the sample trucks below are shown so the layout previews correctly.
-const TRUCKS_FEED_URL = 'https://YOUR-WORKER-URL/api/public/trucks';
+// ============================================================================
+//  >>> SET THIS ONE LINE to connect the site to your truck management system <<<
+//  Replace YOUR-WORKER-URL with your Cloudflare Worker host (no trailing slash),
+//  e.g. 'https://valor-logistics.yourname.workers.dev'.
+//  This one value powers BOTH the Sign In button (top of page) AND the live
+//  Available Trucks feed below. Until it's set, the Sign In button is inert and
+//  the trucks list is empty (never fake/sample units).
+// ============================================================================
+const MGMT_URL = 'https://YOUR-WORKER-URL';
+const TRUCKS_FEED_URL = MGMT_URL + '/api/public/trucks';
 const TRUCKS_APPLY_URL = 'https://intelliapp.driverapponline.com/c/awltransport?uri_b=ia_awltransport_2084954392';
 
 const SAMPLE_TRUCKS = []; const _UNUSED_SAMPLES = [
@@ -986,6 +996,15 @@ async function loadTrucks(){
     setTrucksStatus('We couldn\'t load the live inventory just now. Please check back shortly, or <a href="#contact" style="color:var(--blue-light)">contact us</a> for current availability.');
   }
 }
+
+// point the Sign In button at the management system (same MGMT_URL as the feed)
+(function(){
+  var b = document.getElementById('signinBtn');
+  if (b) {
+    if (MGMT_URL && MGMT_URL.indexOf('YOUR-WORKER-URL') === -1) { b.href = MGMT_URL; }
+    else { b.removeAttribute('target'); b.href = '#'; b.title = 'Management system URL not set yet'; }
+  }
+})();
 
 // initialize routing now that all page handlers are defined
 showPage((location.hash || '#home').slice(1), false);
