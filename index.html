@@ -915,14 +915,12 @@ document.getElementById('leadForm').addEventListener('submit', function(e){
 //     (e.g. valor-logistics.<you>.workers.dev, or app.haulvalor.com if you add a custom domain).
 //     Until you do, the sample trucks below are shown so the layout previews correctly.
 // ============================================================================
-//  >>> SET THIS ONE LINE to connect the site to your truck management system <<<
-//  Replace YOUR-WORKER-URL with your Cloudflare Worker host (no trailing slash),
-//  e.g. 'https://valor-logistics.yourname.workers.dev'.
+//  CONNECTED to the truck management system via MGMT_URL below.
 //  This one value powers BOTH the Sign In button (top of page) AND the live
-//  Available Trucks feed below. Until it's set, the Sign In button is inert and
-//  the trucks list is empty (never fake/sample units).
+//  Available Trucks feed. To repoint later, change MGMT_URL (no trailing slash).
+//  The trucks list only ever shows units you've marked "ready" — never fakes.
 // ============================================================================
-const MGMT_URL = 'https://YOUR-WORKER-URL';
+const MGMT_URL = 'https://valor-fleet.matt-c78.workers.dev';
 const TRUCKS_FEED_URL = MGMT_URL + '/api/public/trucks';
 const TRUCKS_APPLY_URL = 'https://intelliapp.driverapponline.com/c/awltransport?uri_b=ia_awltransport_2084954392';
 
