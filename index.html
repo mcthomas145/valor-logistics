@@ -99,8 +99,6 @@ h1,h2,h3{line-height:1.08;letter-spacing:-.01em}
 .btn-primary:hover{transform:translateY(-3px);box-shadow:0 22px 46px -12px rgba(40,144,232,.85)}
 .btn-ghost{background:rgba(140,170,220,.06);border-color:var(--border-strong);color:var(--text)}
 .btn-ghost:hover{transform:translateY(-3px);border-color:var(--blue);background:rgba(40,144,232,.1)}
-.btn-signin{background:rgba(140,170,220,.06);border-color:var(--border-strong);color:var(--text)}
-.btn-signin:hover{transform:translateY(-3px);border-color:var(--blue);background:rgba(40,144,232,.1)}
 
 /* ----- header ----- */
 header{
@@ -300,13 +298,37 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
   .foot-grid{grid-template-columns:1fr 1fr}
   .why-visual{min-height:300px}
 }
-@media(max-width:680px){
-  .wrap{padding:0 20px}
-  .nav-links{position:fixed;inset:78px 0 auto 0;background:rgba(8,12,22,.97);backdrop-filter:blur(16px);flex-direction:column;gap:0;padding:10px 0;border-bottom:1px solid var(--border);transform:translateY(-130%);transition:transform .35s;align-items:stretch}
+/* ----- available trucks ----- */
+.truck-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:8px}
+.truck-card{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:18px;overflow:hidden;background:rgba(20,29,50,.32);transition:transform .2s,border-color .2s}
+.truck-card:hover{transform:translateY(-4px);border-color:rgba(40,144,232,.5)}
+.truck-photo{position:relative;aspect-ratio:16/10;background:linear-gradient(150deg,rgba(16,64,120,.4),rgba(15,22,38,.6));display:grid;place-items:center;border-bottom:1px solid var(--border);overflow:hidden}
+.truck-photo img{width:100%;height:100%;object-fit:cover}
+.truck-photo .ph-icon{width:42%;opacity:.22;color:var(--navy-bright)}
+.truck-badge{position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.16);color:#5ce39a;border:1px solid rgba(34,197,94,.4);font-size:.66rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+.truck-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:#5ce39a}
+.truck-body{display:flex;flex-direction:column;gap:13px;padding:20px 22px;flex:1}
+.truck-unit{font-size:.74rem;letter-spacing:.06em;color:var(--muted-2);text-transform:uppercase;margin-bottom:3px}
+.truck-title{font-size:1.18rem;font-weight:800;line-height:1.2}
+.truck-specs{display:flex;flex-direction:column;gap:8px;font-size:.92rem;color:var(--muted)}
+.truck-specs .row{display:flex;align-items:center;gap:10px}
+.truck-specs svg{width:17px;height:17px;color:var(--blue-light);flex:none}
+.truck-pay{font-weight:800;color:var(--blue-light);font-size:1.02rem}
+.truck-card .btn{margin-top:auto;justify-content:center}
+.trucks-status{text-align:center;color:var(--muted);padding:54px 20px;font-size:1.02rem;line-height:1.7}
+.trucks-spinner{width:34px;height:34px;border:3px solid var(--border-strong);border-top-color:var(--blue);border-radius:50%;margin:0 auto 16px;animation:tspin 1s linear infinite}
+@keyframes tspin{to{transform:rotate(360deg)}}
+@media(max-width:980px){.truck-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.truck-grid{grid-template-columns:1fr}}
+@media(max-width:1280px){
+  .menu-btn{display:flex}
+  .nav-links{position:fixed;inset:78px 0 auto 0;background:rgba(8,12,22,.97);backdrop-filter:blur(16px);flex-direction:column;gap:0;padding:10px 0;border-bottom:1px solid var(--border);transform:translateY(-130%);transition:transform .35s;align-items:stretch;z-index:95}
   .nav-links.open{transform:none}
   .nav-links a{padding:16px 28px;border-bottom:1px solid var(--border)}
   .nav-links a::after{display:none}
-  .menu-btn{display:flex}
+}
+@media(max-width:680px){
+  .wrap{padding:0 20px}
   .nav-cta .btn-ghost{display:none}
   .cards,.steps,.form .row,.foot-grid{grid-template-columns:1fr}
   .stats .wrap{grid-template-columns:1fr 1fr}
@@ -348,6 +370,7 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
     <nav class="nav-links" id="navLinks">
       <a href="#program">The Program</a>
       <a href="#about">About</a>
+      <a href="#trucks">Available Trucks</a>
       <a href="#how">How It Works</a>
       <a href="#why">Why Valor</a>
       <a href="#warranty">Warranty</a>
@@ -355,8 +378,6 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
       <a href="#contact">Contact</a>
     </nav>
     <div class="nav-cta">
-      <!-- Staff sign-in for the Valor Logistics lease management system. Replace the href with your Cloudflare Worker URL. -->
-      <a href="https://valor-fleet.matt-c78.workers.dev/" target="_blank" rel="noopener" class="btn btn-signin">Sign in</a>
       <a href="https://intelliapp.driverapponline.com/c/awltransport?uri_b=ia_awltransport_2084954392" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">Apply Now</a>
       <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
@@ -631,6 +652,21 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
 </section>
 </div><!-- /about -->
 
+<!-- ============ AVAILABLE TRUCKS PAGE ============ -->
+<div class="page" id="trucks">
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal" style="margin:0 auto;text-align:center">
+      <span class="eyebrow" style="justify-content:center">Available Now</span>
+      <h2>Trucks ready to <span class="grad-text">put you in the driver's seat.</span></h2>
+      <p>These units are available and ready to go. See one you like? Apply and we'll get you rolling.</p>
+    </div>
+    <div id="trucksStatus" class="trucks-status" style="display:none"></div>
+    <div id="trucksGrid" class="truck-grid"></div>
+  </div>
+</section>
+</div><!-- /trucks -->
+
 <!-- ============ CONTACT PAGE ============ -->
 <div class="page" id="contact">
 <section class="section">
@@ -714,6 +750,7 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
       <div class="foot-col">
         <h4>Company</h4>
         <a href="#program">The Program</a>
+        <a href="#trucks">Available Trucks</a>
         <a href="#how">How It Works</a>
         <a href="#why">Why Valor</a>
         <a href="#warranty">Warranty</a>
@@ -767,6 +804,7 @@ function showPage(id, push){
   });
   navLinks.classList.remove('open');
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  if (id === 'trucks' && typeof loadTrucks === 'function') loadTrucks();
   if (push) {
     try { if (location.hash !== '#' + id) history.pushState(null, '', '#' + id); } catch (e) { /* sandboxed preview: ignore */ }
   }
@@ -779,7 +817,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   }
 });
 window.addEventListener('popstate', () => showPage((location.hash || '#home').slice(1), false));
-showPage((location.hash || '#home').slice(1), false);
 
 // ----- photo lightbox -----
 const lb = document.getElementById('lightbox');
@@ -833,6 +870,93 @@ document.getElementById('leadForm').addEventListener('submit', function(e){
     if (err) err.style.display = 'block';
   });
 });
+// ===================== AVAILABLE TRUCKS FEED =====================
+// CONNECTED TO YOUR VALOR LOGISTICS MANAGEMENT SYSTEM.
+// This page pulls live "Available" units from the public, read-only endpoint
+//   /api/public/trucks  on your Cloudflare Worker. That endpoint already:
+//   - returns ONLY trucks in "ready" status (private data is never sent),
+//   - is CORS-open so this page can read it,
+//   - returns { "trucks": [ { unit, year, make, model, image, payment, location, status } ] }.
+//
+// >>> ONE STEP TO GO LIVE: replace YOUR-WORKER-URL below with your real Worker host
+//     (e.g. valor-logistics.<you>.workers.dev, or app.haulvalor.com if you add a custom domain).
+//     Until you do, the sample trucks below are shown so the layout previews correctly.
+const TRUCKS_FEED_URL = 'https://YOUR-WORKER-URL/api/public/trucks';
+const TRUCKS_APPLY_URL = 'https://intelliapp.driverapponline.com/c/awltransport?uri_b=ia_awltransport_2084954392';
+
+const SAMPLE_TRUCKS = [
+  {unit:'1042', year:2021, make:'Freightliner', model:'Cascadia', mileage:412000, engine:'Detroit DD15', transmission:'12-spd Automated', payment:'$0 Down to Start', location:'Indianapolis, IN'},
+  {unit:'0987', year:2020, make:'Peterbilt', model:'579', mileage:498000, engine:'PACCAR MX-13', transmission:'10-spd Manual', payment:'$0 Down to Start', location:'Indianapolis, IN'},
+  {unit:'1155', year:2022, make:'Kenworth', model:'T680', mileage:305000, engine:'PACCAR MX-13', transmission:'12-spd Automated', payment:'$0 Down to Start', location:'Roanoke, VA'}
+];
+
+const TICONS = {
+  gauge:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 13l3.5-3.5"/><path d="M4 18a8 8 0 1 1 16 0"/></svg>',
+  engine:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 13v-2h3l2-3h5v3h3l3 3v3h-2v2H8v-2H5v-3z"/></svg>',
+  gear:'<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
+  pin:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>'
+};
+const TRUCK_PLACEHOLDER = '<svg class="ph-icon" viewBox="0 0 120 64" fill="currentColor"><rect x="2" y="12" width="62" height="34" rx="4"/><rect x="68" y="8" width="15" height="38" rx="3"/><path d="M83 24h13l9 9v13H83z"/><circle cx="46" cy="52" r="7" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="92" cy="52" r="7" fill="none" stroke="currentColor" stroke-width="4"/></svg>';
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function truckCard(t){
+  const title = [t.year, t.make, t.model].filter(Boolean).map(esc).join(' ') || 'Truck';
+  const photo = t.image ? `<img src="${esc(t.image)}" alt="${title}">` : TRUCK_PLACEHOLDER;
+  const rows = [];
+  if (t.mileage != null && t.mileage !== '') rows.push(`<div class="row">${TICONS.gauge}<span>${Number(t.mileage).toLocaleString()} mi</span></div>`);
+  if (t.engine) rows.push(`<div class="row">${TICONS.engine}<span>${esc(t.engine)}</span></div>`);
+  if (t.transmission) rows.push(`<div class="row">${TICONS.gear}<span>${esc(t.transmission)}</span></div>`);
+  if (t.location) rows.push(`<div class="row">${TICONS.pin}<span>${esc(t.location)}</span></div>`);
+  return `<div class="truck-card">
+    <div class="truck-photo"><span class="truck-badge">Available</span>${photo}</div>
+    <div class="truck-body">
+      <div>${t.unit ? `<div class="truck-unit">Unit #${esc(t.unit)}</div>` : ''}<div class="truck-title">${title}</div></div>
+      <div class="truck-specs">${rows.join('')}</div>
+      ${t.payment ? `<div class="truck-pay">${esc(t.payment)}</div>` : ''}
+      <a href="${TRUCKS_APPLY_URL}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Apply for this Truck</a>
+    </div>
+  </div>`;
+}
+
+function setTrucksStatus(html){
+  const s = document.getElementById('trucksStatus'), g = document.getElementById('trucksGrid');
+  if (html){ s.style.display = 'block'; s.innerHTML = html; g.innerHTML = ''; bindHashLinks(s); }
+  else { s.style.display = 'none'; s.innerHTML = ''; }
+}
+function bindHashLinks(scope){
+  scope.querySelectorAll('a[href^="#"]').forEach(a => {
+    const t = a.getAttribute('href').slice(1);
+    if (document.getElementById(t)) a.addEventListener('click', e => { e.preventDefault(); showPage(t, true); });
+  });
+}
+function renderTrucks(list){
+  const g = document.getElementById('trucksGrid');
+  if (!list || !list.length){
+    setTrucksStatus('No trucks are available at the moment. New units come through often — check back soon, or <a href="#contact" style="color:var(--blue-light)">reach out</a> and we\'ll let you know when something fits.');
+    return;
+  }
+  setTrucksStatus('');
+  g.innerHTML = list.map(truckCard).join('');
+}
+async function loadTrucks(){
+  if (!TRUCKS_FEED_URL || TRUCKS_FEED_URL.indexOf('YOUR-WORKER-URL') !== -1){ renderTrucks(SAMPLE_TRUCKS); return; }
+  setTrucksStatus('<div class="trucks-spinner"></div>Loading available trucks…');
+  try{
+    const res = await fetch(TRUCKS_FEED_URL, { headers:{ 'Accept':'application/json' }, cache:'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    let list = Array.isArray(data) ? data : (data.trucks || data.units || data.data || []);
+    // defensive: show only items explicitly Available (the feed should already filter)
+    list = list.filter(t => t && (t.status == null || String(t.status).toLowerCase() === 'available'));
+    renderTrucks(list);
+  } catch (e){
+    setTrucksStatus('We couldn\'t load the live inventory just now. Please check back shortly, or <a href="#contact" style="color:var(--blue-light)">contact us</a> for current availability.');
+  }
+}
+
+// initialize routing now that all page handlers are defined
+showPage((location.hash || '#home').slice(1), false);
 </script>
 </body>
 </html>
