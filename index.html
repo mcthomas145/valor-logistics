@@ -948,8 +948,9 @@ function truckCard(t){
   if (t.numPayments) {
     const fl = { weekly: 'weekly', biweekly: 'bi-weekly', monthly: 'monthly' }[t.frequency] || 'weekly';
     const perYear = { weekly: 52, biweekly: 26, monthly: 12 }[t.frequency] || 52;
-    const yrs = t.numPayments / perYear;
-    const term = t.numPayments + ' ' + fl + ' payments' + (yrs >= 0.5 ? ' (~' + yrs.toFixed(1) + ' yrs)' : '');
+    const months = Math.round(t.numPayments / perYear * 12);
+    const approx = t.frequency === 'monthly' ? '' : '~';
+    const term = t.numPayments + ' ' + fl + ' payments (' + approx + months + ' months)';
     rows.push(`<div class="row">${TICONS.cal}<span>${esc(term)}</span></div>`);
   }
   if (t.mileage != null && t.mileage !== '') rows.push(`<div class="row">${TICONS.gauge}<span>${Number(t.mileage).toLocaleString()} mi</span></div>`);
