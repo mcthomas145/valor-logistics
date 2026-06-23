@@ -946,12 +946,9 @@ function truckCard(t){
   const photo = t.image ? `<img src="${esc(t.image)}" alt="${title}">` : TRUCK_PLACEHOLDER;
   const rows = [];
   if (t.numPayments) {
-    const fl = { weekly: 'weekly', biweekly: 'bi-weekly', monthly: 'monthly' }[t.frequency] || 'weekly';
-    const perYear = { weekly: 52, biweekly: 26, monthly: 12 }[t.frequency] || 52;
-    const months = Math.round(t.numPayments / perYear * 12);
-    const approx = t.frequency === 'monthly' ? '' : '~';
-    const term = t.numPayments + ' ' + fl + ' payments (' + approx + months + ' months)';
-    rows.push(`<div class="row">${TICONS.cal}<span>${esc(term)}</span></div>`);
+    const weeksPer = { weekly: 1, biweekly: 2, monthly: 52 / 12 }[t.frequency] || 1;
+    const weeks = Math.round(t.numPayments * weeksPer);
+    rows.push(`<div class="row">${TICONS.cal}<span>${weeks} weeks</span></div>`);
   }
   if (t.mileage != null && t.mileage !== '') rows.push(`<div class="row">${TICONS.gauge}<span>${Number(t.mileage).toLocaleString()} mi</span></div>`);
   if (t.engine) rows.push(`<div class="row">${TICONS.engine}<span>${esc(t.engine)}</span></div>`);
