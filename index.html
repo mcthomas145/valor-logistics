@@ -955,14 +955,13 @@ function truckCard(t){
   if (t.mileage != null && t.mileage !== '') rows.push(`<div class="row">${TICONS.gauge}<span>${Number(t.mileage).toLocaleString()} mi</span></div>`);
   if (t.engine) rows.push(`<div class="row">${TICONS.engine}<span>${esc(t.engine)}</span></div>`);
   if (t.transmission) rows.push(`<div class="row">${TICONS.gear}<span>${esc(t.transmission)}</span></div>`);
-  if (t.termWeeks) rows.push(`<div class="row">${TICONS.term}<span>${Number(t.termWeeks).toLocaleString()} weeks to own</span></div>`);
   if (t.location) rows.push(`<div class="row">${TICONS.pin}<span>${esc(t.location)}</span></div>`);
   return `<div class="truck-card">
     ${photoBlock}
     <div class="truck-body">
       <div>${t.unit ? `<div class="truck-unit">Unit #${esc(t.unit)}</div>` : ''}<div class="truck-title">${title}</div></div>
       <div class="truck-specs">${rows.join('')}</div>
-      ${t.payment ? `<div class="truck-pay">${esc(t.payment)}</div>` : ''}
+      ${t.payment ? `<div class="truck-pay">${esc(t.payment)}${t.termWeeks ? ` for ${Number(t.termWeeks).toLocaleString()} weeks` : ''}</div>` : ''}
       <a href="${TRUCKS_APPLY_URL}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Apply for this Truck</a>
     </div>
   </div>`;
