@@ -902,7 +902,8 @@ const TICONS = {
   gauge:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 13l3.5-3.5"/><path d="M4 18a8 8 0 1 1 16 0"/></svg>',
   engine:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 13v-2h3l2-3h5v3h3l3 3v3h-2v2H8v-2H5v-3z"/></svg>',
   gear:'<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
-  pin:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>'
+  pin:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  term:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
 };
 const TRUCK_PLACEHOLDER = '<svg class="ph-icon" viewBox="0 0 120 64" fill="currentColor"><rect x="2" y="12" width="62" height="34" rx="4"/><rect x="68" y="8" width="15" height="38" rx="3"/><path d="M83 24h13l9 9v13H83z"/><circle cx="46" cy="52" r="7" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="92" cy="52" r="7" fill="none" stroke="currentColor" stroke-width="4"/></svg>';
 
@@ -920,6 +921,7 @@ function normTruck(t){
     mileage:      pick(t, ['mileage','miles','odometer','odo']),
     engine:       pick(t, ['engine','engine_type','engineType','motor']),
     transmission: pick(t, ['transmission','trans','gearbox']),
+    termWeeks:    pick(t, ['termWeeks','term_weeks','weeks','termWks']),
     payment:      pick(t, ['payment','price','weekly','weekly_payment','weeklyPayment','rate','terms']),
     location:     pick(t, ['location','city','yard','lot','terminal']),
     image:        pick(t, ['image','photo','img','image_url','imageUrl','photo_url','photoUrl','thumbnail']),
@@ -953,6 +955,7 @@ function truckCard(t){
   if (t.mileage != null && t.mileage !== '') rows.push(`<div class="row">${TICONS.gauge}<span>${Number(t.mileage).toLocaleString()} mi</span></div>`);
   if (t.engine) rows.push(`<div class="row">${TICONS.engine}<span>${esc(t.engine)}</span></div>`);
   if (t.transmission) rows.push(`<div class="row">${TICONS.gear}<span>${esc(t.transmission)}</span></div>`);
+  if (t.termWeeks) rows.push(`<div class="row">${TICONS.term}<span>${Number(t.termWeeks).toLocaleString()} weeks to own</span></div>`);
   if (t.location) rows.push(`<div class="row">${TICONS.pin}<span>${esc(t.location)}</span></div>`);
   return `<div class="truck-card">
     ${photoBlock}
