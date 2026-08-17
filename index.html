@@ -966,16 +966,15 @@ function truckCard(t){
   const photos = (Array.isArray(t.photos) && t.photos.length) ? t.photos : (t.image ? [t.image] : []);
   let photoBlock;
   if (!photos.length){
-    photoBlock = `<div class="truck-photo"><span class="truck-badge">Available</span>${TRUCK_PLACEHOLDER}</div>`;
+    photoBlock = `<div class="truck-photo">${TRUCK_PLACEHOLDER}</div>`;
   } else if (photos.length === 1){
-    photoBlock = `<div class="truck-photo"><span class="truck-badge">Available</span><img src="${esc(photos[0])}" alt="${title}"></div>`;
+    photoBlock = `<div class="truck-photo"><img src="${esc(photos[0])}" alt="${title}"></div>`;
   } else {
     // cover is photos[0]; the track starts scrolled left so it always opens on the cover
     const slides = photos.map((p,i)=>`<img src="${esc(p)}" alt="${title}${i?(' — photo '+(i+1)):''}"${i?' loading="lazy"':''}>`).join('');
     const dots = photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('');
     const chev = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="${d==='l'?'15 18 9 12 15 6':'9 18 15 12 9 6'}"></polyline></svg>`;
     photoBlock = `<div class="truck-photo tp-gallery">
-      <span class="truck-badge">Available</span>
       <div class="tp-track">${slides}</div>
       <button type="button" class="tp-nav tp-prev" aria-label="Previous photo" disabled>${chev('l')}</button>
       <button type="button" class="tp-nav tp-next" aria-label="Next photo">${chev('r')}</button>
