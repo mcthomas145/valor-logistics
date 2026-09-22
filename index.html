@@ -1191,7 +1191,7 @@ showPage((location.hash || '#home').slice(1), false);
     <div id="applyForm">
       <label class="apply-f"><span>Full name</span><input id="ap_name" type="text" autocomplete="name"></label>
       <label class="apply-f"><span>Email</span><input id="ap_email" type="email" autocomplete="email"></label>
-      <label class="apply-f"><span>Phone</span><input id="ap_phone" type="tel" autocomplete="tel"></label>
+      <label class="apply-f"><span>Phone</span><input id="ap_phone" type="tel" autocomplete="tel" oninput="this.value=window.fmtPhone(this.value)"></label>
       <button type="button" class="btn btn-primary apply-submit" onclick="submitApply()">Submit application</button>
       <p class="apply-err" id="ap_err" hidden></p>
     </div>
@@ -1201,6 +1201,7 @@ showPage((location.hash || '#home').slice(1), false);
 <script>
 (function(){
   const LEAD_URL = (typeof TRUCKS_FEED_URL!=='undefined'?TRUCKS_FEED_URL:'https://valor-fleet.matt-c78.workers.dev/api/public/trucks').replace('/public/trucks','/public/lead');
+  window.fmtPhone=function(v){ const d=(v||'').replace(/\D/g,'').slice(0,10); if(!d)return ''; if(d.length<4)return '('+d; if(d.length<7)return '('+d.slice(0,3)+') '+d.slice(3); return '('+d.slice(0,3)+') '+d.slice(3,6)+' - '+d.slice(6); };
   let _t={};
   const $=id=>document.getElementById(id);
   window.openApply=function(btn){ _t={unit:btn.dataset.unit||'',model:btn.dataset.model||'',id:btn.dataset.id||''};
