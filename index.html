@@ -1258,6 +1258,10 @@ showPage((location.hash || '#home').slice(1), false);
   };
   document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeApply(); });
   const ov=$('applyModal'); if(ov) ov.addEventListener('click',e=>{ if(e.target===ov)closeApply(); });
+  // Auto-open the apply form when arriving from a truck page (/?unit=...&model=...&id=...#apply)
+  try{ var qp=new URLSearchParams(location.search);
+    if(qp.get('unit')||qp.get('model')){ window.openApply({dataset:{unit:qp.get('unit')||'',model:qp.get('model')||'',id:qp.get('id')||''}}); }
+  }catch(e){}
 })();
 </script>
 </body>
