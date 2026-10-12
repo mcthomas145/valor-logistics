@@ -1,0 +1,49 @@
+name: Build truck SEO pages
+
+# Keeps the /trucks/ SEO pages, sitemap, and photos in sync with the live
+# inventory feed. Runs on a schedule, on manual click, and on each push.
+on:
+  schedule:
+    - cron: '0 */6 * * *'      # every 6 hours
+  workflow_dispatch:            # lets you run it by hand from the Actions tab
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'trucks/**'
+      - 'img/trucks/**'
+      - 'sitemap.xml'
+      - 'robots.txt'
+
+permissions:
+  contents: write               # allow the action to commit the generated pages
+
+concurrency:
+  group: build-trucks
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build truck pages from the live feed
+        run: node scripts/build-trucks.js
+
+      - name: Commit changes if anything changed
+        run: |
+          git config user.name  "valor-seo-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add trucks img/trucks sitemap.xml robots.txt
+          if git diff --staged --quiet; then
+            echo "No inventory changes — nothing to commit."
+          else
+            git commit -m "Auto-update truck SEO pages from live feed"
+            git push
+          fi
