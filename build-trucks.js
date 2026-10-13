@@ -39,7 +39,9 @@ footer{border-top:1px solid rgba(140,170,220,.12);padding:26px 22px;text-align:c
 .card{background:#0f1626;border:1px solid rgba(140,170,220,.12);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;display:block;transition:border-color .15s}
 .card:hover{border-color:rgba(90,169,242,.5)}.card img{width:100%;height:190px;object-fit:cover;display:block}
 .card .body{padding:14px 16px}.card .ttl{font-weight:800;color:#fff;font-size:16px;margin-bottom:6px}
-.card .meta{color:#9aa8c2;font-size:13.5px;line-height:1.5}.card .p{color:#5ce39a;font-weight:700}`;
+.card .meta{color:#9aa8c2;font-size:13.5px;line-height:1.5}.card .p{color:#5ce39a;font-weight:700}
+.card.soon{position:relative}.card.soon img{filter:saturate(.85)}
+.soonbadge{position:absolute;top:10px;left:10px;z-index:2;background:rgba(168,85,247,.92);color:#fff;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:30px}`;
 const FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Archivo:wght@400;700;800&display=swap" rel="stylesheet">';
 const HEADER = '<header><div class="bar"><a class="brand" href="/"><span class="v">VALOR</span><span class="s">LOGISTICS</span></a><a class="cta" href="/trucks/">Available Trucks</a></div></header>';
 const FOOTER = '<footer>© <span id="yr"></span> Valor Logistics · $0 Down Lease Purchase Semi Trucks · Indianapolis, IN &nbsp;·&nbsp; <a href="/">Home</a> · <a href="/trucks/">Trucks</a> · <a href="/privacy.html">Privacy</a><script>document.getElementById("yr").textContent=new Date().getFullYear();</script></footer>';
@@ -56,6 +58,7 @@ function rmrf(p){ if(fs.existsSync(p)) fs.rmSync(p,{recursive:true,force:true});
   const data = await getFeed();
   const all = data.trucks || (Array.isArray(data)?data:[]);
   const trucks = all.filter(t => String(t.status||'').toLowerCase()==='available');
+  const held   = all.filter(t => t.hold || String(t.status||'').toLowerCase()==='available soon');
 
   // clean previously generated content so sold trucks drop off
   rmrf(path.join(ROOT,'trucks'));
@@ -102,6 +105,7 @@ function rmrf(p){ if(fs.existsSync(p)) fs.rmSync(p,{recursive:true,force:true});
     if(sale!=null) facts.push(["Sale price",`$${commafy(sale)}`]);
     if(milesF) facts.push(["Mileage",milesF]);
     if(trans) facts.push(["Transmission",esc(trans)]);
+    if(t.engineRebuilt) facts.push(["Engine",'<span class="pay">Rebuilt</span>']);
     if(loc) facts.push(["Location",esc(loc)]);
     facts.push(["Status","Available"]);
     const factsHtml=facts.map(([k,v])=>`<div><span class="k">${k}</span><span class="val">${v}</span></div>`).join('');
@@ -151,6 +155,28 @@ ${FOOTER}
     cards.push(`<a class="card" href="/trucks/${sl}/">${imgpath?`<img src="${imgpath}" alt="${esc(alt)}" loading="lazy">`:''}<div class="body"><div class="ttl">${esc(name)}</div><div class="meta">Unit ${esc(unit)}${milesF?' · '+milesF+' mi':''}${loc?' · '+esc(loc):''}<br><span class="p">${esc(pay)}</span>${pay?' · $0 down':'$0 down'}</div></div></a>`);
   }
 
+  // "Available Soon" cards (trucks on Hold) — shown on the index only; no indexable pages, not in sitemap.
+  const soonCards = [];
+  for (const t of held){
+    const unit=String(t.unit||'').trim(), year=String(t.year||'').trim(), model=String(t.model||'').trim();
+    const name=`${year} ${model}`.trim(), pay=String(t.payment||'').trim(), loc=String(t.location||'').trim();
+    const miles=num(t.mileage), milesF=commafy(miles);
+    let imgpath=`/img/trucks/${unit}-1.jpg`;
+    const img=(t.image || (t.photos&&t.photos[0]) || '');
+    if (typeof img==='string' && img.startsWith('data:')){
+      try{ fs.writeFileSync(path.join(ROOT,'img','trucks',`${unit}-1.jpg`), Buffer.from(img.split(',')[1],'base64')); }catch(e){ imgpath=''; }
+    } else { imgpath=''; }
+    const alt=`${name} – coming soon – unit ${unit}`;
+    const applyUrl=`/?unit=${encodeURIComponent(unit)}&model=${encodeURIComponent(model)}#apply`;
+    soonCards.push(`<a class="card soon" href="${applyUrl}"><span class="soonbadge">Available Soon</span>${imgpath?`<img src="${imgpath}" alt="${esc(alt)}" loading="lazy">`:''}<div class="body"><div class="ttl">${esc(name)}</div><div class="meta">Unit ${esc(unit)}${milesF?' · '+milesF+' mi':''}${loc?' · '+esc(loc):''}<br><span class="p">${esc(pay)}</span> · join the waitlist</div></div></a>`);
+  }
+  const soonSection = soonCards.length ? `
+  <h2 style="font-family:'Marcellus',serif;font-weight:400;font-size:1.7rem;margin:40px 0 4px">Available Soon</h2>
+  <p class="sub">Being held for drivers in qualification — join the waitlist and we'll reach out the moment one opens up.</p>
+  <div class="tgrid">
+  ${soonCards.join('\n  ')}
+  </div>` : '';
+
   const idxTitle='Available $0 Down Lease Purchase Semi Trucks | Valor Logistics';
   const idxDesc=`Browse ${built} available $0 down lease-purchase semi trucks from Valor Logistics. Fixed weekly payments, no large upfront cost, and a clear path to ownership for CDL-A drivers.`;
   const idx=`<!doctype html>
@@ -177,6 +203,7 @@ ${HEADER}
   <div class="tgrid">
   ${cards.join('\n  ')}
   </div>
+  ${soonSection}
   <div class="navlinks" style="margin-top:14px"><a href="/">← Back to home</a></div>
 </main>
 ${FOOTER}
