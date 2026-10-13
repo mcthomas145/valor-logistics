@@ -1112,7 +1112,9 @@ function normTruck(t){
     photos:       (Array.isArray(t.photos) ? t.photos : (Array.isArray(t.images) ? t.images : [])).filter(Boolean),
     status:       pick(t, ['status','availability','state']),
     id:           pick(t, ['id','truck_id','truckId']),
-    hold:         !!t.hold
+    hold:         !!t.hold,
+    vin:          pick(t, ['vin','VIN']),
+    engineRebuilt:!!(t.engineRebuilt || t.engine_rebuilt || t.rebuilt)
   };
 }
 
@@ -1137,10 +1139,12 @@ function truckCard(t){
     </div>`;
   }
   const rows = [];
-  if (false && t.mileage != null && t.mileage !== '') rows.push(`<div class="row">${TICONS.gauge}<span>${Number(t.mileage).toLocaleString()} mi</span></div>`);
+  if (t.mileage != null && t.mileage !== '' && Number(t.mileage) > 0) rows.push(`<div class="row">${TICONS.gauge}<span>${Number(t.mileage).toLocaleString()} mi</span></div>`);
   if (t.engine) rows.push(`<div class="row">${TICONS.engine}<span>${esc(t.engine)}</span></div>`);
+  if (t.engineRebuilt) rows.push(`<div class="row">${TICONS.engine}<span>Rebuilt engine</span></div>`);
   if (t.transmission) rows.push(`<div class="row">${TICONS.gear}<span>${esc(t.transmission)}</span></div>`);
   if (t.location) rows.push(`<div class="row">${TICONS.pin}<span>${esc(t.location)}</span></div>`);
+  if (t.vin) rows.push(`<div class="row">${TICONS.vin||TICONS.gauge}<span style="font-family:monospace;font-size:.85em;letter-spacing:.01em">VIN ${esc(t.vin)}</span></div>`);
   const soon = !!t.hold || String(t.status||'').toLowerCase()==='available soon';
   const btn = soon
     ? `<button type="button" class="btn btn-soon" onclick="openApply(this)" data-unit="${esc(t.unit||'')}" data-model="${title}" data-id="${esc(t.id||'')}">Join the waitlist</button>`
