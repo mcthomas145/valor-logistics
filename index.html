@@ -362,6 +362,11 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
 .truck-pay{font-weight:800;color:var(--blue-light);font-size:1.02rem}
 .truck-card .btn{margin-top:auto;justify-content:center}
 .trucks-status{text-align:center;color:var(--muted);padding:54px 20px;font-size:1.02rem;line-height:1.7}
+.truck-card.soon{position:relative}
+.truck-card.soon .truck-photo{filter:saturate(.85)}
+.soon-badge{position:absolute;top:12px;left:12px;z-index:2;background:rgba(168,85,247,.92);color:#fff;font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:30px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.btn.btn-soon{background:rgba(168,85,247,.16);color:#d8b4fe;border:1px solid rgba(168,85,247,.4)}
+.btn.btn-soon:hover{background:rgba(168,85,247,.26)}
 .trucks-spinner{width:34px;height:34px;border:3px solid var(--border-strong);border-top-color:var(--blue);border-radius:50%;margin:0 auto 16px;animation:tspin 1s linear infinite}
 @keyframes tspin{to{transform:rotate(360deg)}}
 @media(max-width:980px){.truck-grid{grid-template-columns:1fr 1fr}}
@@ -830,6 +835,14 @@ footer{border-top:1px solid var(--border);padding:64px 0 36px;background:rgba(11
     </div>
     <div id="trucksStatus" class="trucks-status" style="display:none"></div>
     <div id="trucksGrid" class="truck-grid"></div>
+    <div id="soonWrap" style="display:none;margin-top:54px">
+      <div class="section-head reveal" style="margin:0 auto 4px;text-align:center">
+        <span class="eyebrow" style="justify-content:center">Available Soon</span>
+        <h2 style="font-size:clamp(1.6rem,3.4vw,2.2rem)">More trucks <span class="grad-text">on the way.</span></h2>
+        <p>These units are being held for drivers in qualification. Interested? Join the waitlist and we'll reach out the moment one opens up.</p>
+      </div>
+      <div id="soonGrid" class="truck-grid"></div>
+    </div>
   </div>
 </section>
 </div><!-- /trucks -->
@@ -1097,7 +1110,9 @@ function normTruck(t){
     location:     pick(t, ['location','city','yard','lot','terminal']),
     image:        pick(t, ['image','photo','img','image_url','imageUrl','photo_url','photoUrl','thumbnail']),
     photos:       (Array.isArray(t.photos) ? t.photos : (Array.isArray(t.images) ? t.images : [])).filter(Boolean),
-    status:       pick(t, ['status','availability','state'])
+    status:       pick(t, ['status','availability','state']),
+    id:           pick(t, ['id','truck_id','truckId']),
+    hold:         !!t.hold
   };
 }
 
@@ -1126,13 +1141,18 @@ function truckCard(t){
   if (t.engine) rows.push(`<div class="row">${TICONS.engine}<span>${esc(t.engine)}</span></div>`);
   if (t.transmission) rows.push(`<div class="row">${TICONS.gear}<span>${esc(t.transmission)}</span></div>`);
   if (t.location) rows.push(`<div class="row">${TICONS.pin}<span>${esc(t.location)}</span></div>`);
-  return `<div class="truck-card">
+  const soon = !!t.hold || String(t.status||'').toLowerCase()==='available soon';
+  const btn = soon
+    ? `<button type="button" class="btn btn-soon" onclick="openApply(this)" data-unit="${esc(t.unit||'')}" data-model="${title}" data-id="${esc(t.id||'')}">Join the waitlist</button>`
+    : `<button type="button" class="btn btn-primary" onclick="openApply(this)" data-unit="${esc(t.unit||'')}" data-model="${title}" data-id="${esc(t.id||'')}">Apply for this Truck</button>`;
+  return `<div class="truck-card${soon?' soon':''}">
+    ${soon?'<span class="soon-badge">Available Soon</span>':''}
     ${photoBlock}
     <div class="truck-body">
       <div>${t.unit ? `<div class="truck-unit">Unit #${esc(t.unit)}</div>` : ''}<div class="truck-title">${title}</div></div>
       <div class="truck-specs">${rows.join('')}</div>
       ${t.payment ? `<div class="truck-pay">${esc(t.payment)}${t.termWeeks ? ` for ${Number(t.termWeeks).toLocaleString()} weeks` : ''}</div>` : ''}
-      <button type="button" class="btn btn-primary" onclick="openApply(this)" data-unit="${esc(t.unit||'')}" data-model="${title}" data-id="${esc(t.id||'')}">Apply for this Truck</button>
+      ${btn}
     </div>
   </div>`;
 }
@@ -1172,15 +1192,24 @@ function bindHashLinks(scope){
     if (document.getElementById(t)) a.addEventListener('click', e => { e.preventDefault(); showPage(t, true); });
   });
 }
+function isSoon(t){ return !!t.hold || String(t.status||'').toLowerCase()==='available soon'; }
 function renderTrucks(list){
   const g = document.getElementById('trucksGrid');
-  if (!list || !list.length){
+  const soonWrap = document.getElementById('soonWrap'), soonGrid = document.getElementById('soonGrid');
+  const avail = (list||[]).filter(t => !isSoon(t));
+  const soon  = (list||[]).filter(isSoon);
+  if (!avail.length && !soon.length){
     setTrucksStatus('No trucks are available at the moment. New units come through often — check back soon, or <a href="#contact" style="color:var(--blue-light)">reach out</a> and we\'ll let you know when something fits.');
+    if (soonWrap) soonWrap.style.display='none';
     return;
   }
   setTrucksStatus('');
-  g.innerHTML = list.map(truckCard).join('');
+  g.innerHTML = avail.map(truckCard).join('');
   wireGalleries(g);
+  if (soonGrid){
+    if (soon.length){ soonGrid.innerHTML = soon.map(truckCard).join(''); wireGalleries(soonGrid); soonWrap.style.display=''; }
+    else { soonWrap.style.display='none'; }
+  }
 }
 async function loadTrucks(){
   if (!TRUCKS_FEED_URL){ renderTrucks(SAMPLE_TRUCKS); return; }
@@ -1191,8 +1220,8 @@ async function loadTrucks(){
     const data = await res.json();
     let list = Array.isArray(data) ? data : (data.trucks || data.units || data.data || data.results || data.available || []);
     list = list.map(normTruck)
-               // defensive: show only Available (your feed should already filter these)
-               .filter(t => t.status == null || String(t.status).toLowerCase() === 'available');
+               // keep Available and Available Soon (Hold); drop anything else
+               .filter(t => { const s=String(t.status||'available').toLowerCase(); return s==='available' || s==='available soon' || t.hold; });
     renderTrucks(list);
   } catch (e){
     setTrucksStatus('We couldn\'t load the live inventory just now. Please check back shortly, or <a href="#contact" style="color:var(--blue-light)">contact us</a> for current availability.');
