@@ -1113,7 +1113,6 @@ function normTruck(t){
     status:       pick(t, ['status','availability','state']),
     id:           pick(t, ['id','truck_id','truckId']),
     hold:         !!t.hold,
-    vin:          pick(t, ['vin','VIN']),
     engineRebuilt:!!(t.engineRebuilt || t.engine_rebuilt || t.rebuilt)
   };
 }
@@ -1144,7 +1143,6 @@ function truckCard(t){
   if (t.engineRebuilt) rows.push(`<div class="row">${TICONS.engine}<span>Rebuilt engine</span></div>`);
   if (t.transmission) rows.push(`<div class="row">${TICONS.gear}<span>${esc(t.transmission)}</span></div>`);
   if (t.location) rows.push(`<div class="row">${TICONS.pin}<span>${esc(t.location)}</span></div>`);
-  if (t.vin) rows.push(`<div class="row">${TICONS.vin||TICONS.gauge}<span style="font-family:monospace;font-size:.85em;letter-spacing:.01em">VIN ${esc(t.vin)}</span></div>`);
   const soon = !!t.hold || String(t.status||'').toLowerCase()==='available soon';
   const btn = soon
     ? `<button type="button" class="btn btn-soon" onclick="openApply(this)" data-unit="${esc(t.unit||'')}" data-model="${title}" data-id="${esc(t.id||'')}">Join the waitlist</button>`
