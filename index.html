@@ -1206,6 +1206,7 @@ function renderTrucks(list){
     return;
   }
   setTrucksStatus('');
+  window.__APPLY_TRUCKS = (avail.concat(soon));   // feed the apply form's multi-select
   g.innerHTML = avail.map(truckCard).join('');
   wireGalleries(g);
   if (soonGrid){
@@ -1254,9 +1255,10 @@ showPage((location.hash || '#home').slice(1), false);
 <div id="applyModal" class="apply-overlay" hidden>
   <div class="apply-card">
     <button class="apply-x" type="button" aria-label="Close" onclick="closeApply()">&times;</button>
-    <h3>Apply for this Truck</h3>
+    <h3>Apply for a Truck</h3>
     <p id="applyForWhich" class="apply-sub"></p>
     <div id="applyForm">
+      <div class="apply-f" id="ap_trucksWrap"><span>Which truck(s) are you interested in? <em style="color:#8aa0c2;font-weight:400;text-transform:none;letter-spacing:0">Pick all that apply</em></span><div id="ap_trucks" class="ap-trucks"></div></div>
       <label class="apply-f"><span>Full name</span><input id="ap_name" type="text" autocomplete="name"></label>
       <label class="apply-f"><span>Email</span><input id="ap_email" type="email" autocomplete="email"></label>
       <label class="apply-f"><span>Phone</span><input id="ap_phone" type="tel" autocomplete="tel" oninput="this.value=window.fmtPhone(this.value)"></label>
