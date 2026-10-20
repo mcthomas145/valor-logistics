@@ -49,7 +49,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
 h1,h2,h3,h4{font-family:'Poppins',sans-serif;color:var(--ink);line-height:1.15;letter-spacing:-.01em}
-.wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+.wrap{width:100%;max-width:1680px;margin:0 auto;padding:0 clamp(20px,4vw,64px)}
 .glow-orb{display:none}
 .page{display:none}
 .page.active{display:block;flex:1 0 auto;animation:pagein .45s ease}
@@ -1198,7 +1198,7 @@ function renderTrucks(list){
     return;
   }
   setTrucksStatus('');
-  window.__APPLY_TRUCKS = (avail.concat(soon));   // feed the apply form's multi-select
+  window.__APPLY_TRUCKS = avail;   // apply form shows ONLY actively available units (no Available Soon / held)
   g.innerHTML = avail.map(truckCard).join('');
   wireGalleries(g);
   if (soonGrid){
