@@ -824,9 +824,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 30px;background:var(--bg-
     <div id="trucksGrid" class="truck-grid"></div>
     <div id="soonWrap" style="display:none;margin-top:54px">
       <div class="section-head reveal" style="margin:0 auto 4px;text-align:center">
-        <span class="eyebrow" style="justify-content:center">Available Soon</span>
+        <span class="eyebrow" style="justify-content:center">Coming Soon</span>
         <h2 style="font-size:clamp(1.6rem,3.4vw,2.2rem)">More trucks <span class="grad-text">on the way.</span></h2>
-        <p>These units are being held for drivers in qualification. Interested? Join the waitlist and we'll reach out the moment one opens up.</p>
+        <p>These units are arriving soon or being held for drivers in qualification. Interested? Join the waitlist and we'll reach out the moment one opens up.</p>
       </div>
       <div id="soonGrid" class="truck-grid"></div>
     </div>
@@ -1105,6 +1105,7 @@ function normTruck(t){
     status:       pick(t, ['status','availability','state']),
     id:           pick(t, ['id','truck_id','truckId']),
     hold:         !!t.hold,
+    comingSoon:   !!(t.comingSoon || t.coming_soon),
     engineRebuilt:!!(t.engineRebuilt || t.engine_rebuilt || t.rebuilt)
   };
 }
@@ -1135,12 +1136,13 @@ function truckCard(t){
   if (t.engineRebuilt) rows.push(`<div class="row">${TICONS.engine}<span>Rebuilt engine</span></div>`);
   if (t.transmission) rows.push(`<div class="row">${TICONS.gear}<span>${esc(t.transmission)}</span></div>`);
   if (t.location) rows.push(`<div class="row">${TICONS.pin}<span>${esc(t.location)}</span></div>`);
-  const soon = !!t.hold || String(t.status||'').toLowerCase()==='available soon';
+  const coming = !!t.comingSoon || String(t.status||'').toLowerCase()==='coming soon';
+  const soon = coming || !!t.hold || String(t.status||'').toLowerCase()==='available soon';
   const btn = soon
     ? `<button type="button" class="btn btn-soon" onclick="openApply(this)" data-unit="${esc(t.unit||'')}" data-model="${title}" data-id="${esc(t.id||'')}">Join the waitlist</button>`
     : `<button type="button" class="btn btn-primary" onclick="openApply(this)" data-unit="${esc(t.unit||'')}" data-model="${title}" data-id="${esc(t.id||'')}">Apply for this Truck</button>`;
   return `<div class="truck-card${soon?' soon':''}">
-    ${soon?'<span class="soon-badge">Available Soon</span>':''}
+    ${soon?`<span class="soon-badge">${coming?'Coming Soon':'Available Soon'}</span>`:''}
     ${photoBlock}
     <div class="truck-body">
       <div>${t.unit ? `<div class="truck-unit">Unit #${esc(t.unit)}</div>` : ''}<div class="truck-title">${title}</div></div>
@@ -1186,7 +1188,7 @@ function bindHashLinks(scope){
     if (document.getElementById(t)) a.addEventListener('click', e => { e.preventDefault(); showPage(t, true); });
   });
 }
-function isSoon(t){ return !!t.hold || String(t.status||'').toLowerCase()==='available soon'; }
+function isSoon(t){ const s=String(t.status||'').toLowerCase(); return !!t.hold || !!t.comingSoon || s==='available soon' || s==='coming soon'; }
 function renderTrucks(list){
   const g = document.getElementById('trucksGrid');
   const soonWrap = document.getElementById('soonWrap'), soonGrid = document.getElementById('soonGrid');
@@ -1215,8 +1217,8 @@ async function loadTrucks(){
     const data = await res.json();
     let list = Array.isArray(data) ? data : (data.trucks || data.units || data.data || data.results || data.available || []);
     list = list.map(normTruck)
-               // keep Available and Available Soon (Hold); drop anything else
-               .filter(t => { const s=String(t.status||'available').toLowerCase(); return s==='available' || s==='available soon' || t.hold; });
+               // keep Available, Available Soon (Hold), and Coming Soon; drop anything else
+               .filter(t => { const s=String(t.status||'available').toLowerCase(); return s==='available' || s==='available soon' || s==='coming soon' || t.hold || t.comingSoon; });
     renderTrucks(list);
   } catch (e){
     setTrucksStatus('We couldn\'t load the live inventory just now. Please check back shortly, or <a href="#contact" style="color:var(--blue-light)">contact us</a> for current availability.');
