@@ -824,9 +824,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 30px;background:var(--bg-
     <div id="trucksGrid" class="truck-grid"></div>
     <div id="soonWrap" style="display:none;margin-top:54px">
       <div class="section-head reveal" style="margin:0 auto 4px;text-align:center">
-        <span class="eyebrow" style="justify-content:center">Coming Soon</span>
+        <span class="eyebrow" id="soonEyebrow" style="justify-content:center">Coming Soon</span>
         <h2 style="font-size:clamp(1.6rem,3.4vw,2.2rem)">More trucks <span class="grad-text">on the way.</span></h2>
-        <p>These units are arriving soon or being held for drivers in qualification. Interested? Join the waitlist and we'll reach out the moment one opens up.</p>
+        <p id="soonDesc">These units are arriving soon or being held for drivers in qualification. Interested? Join the waitlist and we'll reach out the moment one opens up.</p>
       </div>
       <div id="soonGrid" class="truck-grid"></div>
     </div>
@@ -1188,6 +1188,7 @@ function bindHashLinks(scope){
     if (document.getElementById(t)) a.addEventListener('click', e => { e.preventDefault(); showPage(t, true); });
   });
 }
+function isComingTruck(t){ return !!t.comingSoon || String(t.status||'').toLowerCase()==='coming soon'; }
 function isSoon(t){ const s=String(t.status||'').toLowerCase(); return !!t.hold || !!t.comingSoon || s==='available soon' || s==='coming soon'; }
 function renderTrucks(list){
   const g = document.getElementById('trucksGrid');
@@ -1204,7 +1205,17 @@ function renderTrucks(list){
   g.innerHTML = avail.map(truckCard).join('');
   wireGalleries(g);
   if (soonGrid){
-    if (soon.length){ soonGrid.innerHTML = soon.map(truckCard).join(''); wireGalleries(soonGrid); soonWrap.style.display=''; }
+    if (soon.length){
+      soonGrid.innerHTML = soon.map(truckCard).join(''); wireGalleries(soonGrid); soonWrap.style.display='';
+      const anyComing = soon.some(isComingTruck), anyHeld = soon.some(t => !isComingTruck(t));
+      const eb = document.getElementById('soonEyebrow'), ds = document.getElementById('soonDesc');
+      if (eb) eb.textContent = anyComing ? 'Coming Soon' : 'Available Soon';   // never say "Coming Soon" with no coming-soon units
+      if (ds) ds.textContent = (anyComing && anyHeld)
+        ? 'These units are arriving soon or being held for drivers in qualification. Interested? Join the waitlist and we\'ll reach out the moment one opens up.'
+        : anyComing
+          ? 'These units are arriving soon. Interested? Join the waitlist and we\'ll reach out the moment one is ready.'
+          : 'These units are being held for drivers in qualification. Interested? Join the waitlist and we\'ll reach out the moment one opens up.';
+    }
     else { soonWrap.style.display='none'; }
   }
 }
