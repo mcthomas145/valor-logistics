@@ -1079,7 +1079,8 @@ const TICONS = {
   engine:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 13v-2h3l2-3h5v3h3l3 3v3h-2v2H8v-2H5v-3z"/></svg>',
   gear:'<svg fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.4"/><circle cx="7.6" cy="6.7" r="1.15"/><circle cx="12" cy="6.7" r="1.15"/><circle cx="16.4" cy="6.7" r="1.15"/><path d="M7.6 7.85V11.6M12 7.85V11.6M16.4 7.85V11.6M7.6 11.6h8.8M7.6 11.6v3.85M12 11.6v3.85M16.4 11.6v3.85"/><circle cx="7.6" cy="16.6" r="1.15"/><circle cx="12" cy="16.6" r="1.15"/><circle cx="16.4" cy="16.6" r="1.15"/></svg>',
   pin:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
-  term:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+  term:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  apu:'<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M13 2L5 13h6l-1 9 9-12h-6z"/></svg>'
 };
 const TRUCK_PLACEHOLDER = '<svg class="ph-icon" viewBox="0 0 120 64" fill="currentColor"><rect x="2" y="12" width="62" height="34" rx="4"/><rect x="68" y="8" width="15" height="38" rx="3"/><path d="M83 24h13l9 9v13H83z"/><circle cx="46" cy="52" r="7" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="92" cy="52" r="7" fill="none" stroke="currentColor" stroke-width="4"/></svg>';
 
@@ -1106,7 +1107,8 @@ function normTruck(t){
     id:           pick(t, ['id','truck_id','truckId']),
     hold:         !!t.hold,
     comingSoon:   !!(t.comingSoon || t.coming_soon),
-    engineRebuilt:!!(t.engineRebuilt || t.engine_rebuilt || t.rebuilt)
+    engineRebuilt:!!(t.engineRebuilt || t.engine_rebuilt || t.rebuilt),
+    apu:          !!(t.apu || t.APU || t.has_apu || t.hasApu)
   };
 }
 
@@ -1135,6 +1137,7 @@ function truckCard(t){
   if (t.engine) rows.push(`<div class="row">${TICONS.engine}<span>${esc(t.engine)}</span></div>`);
   if (t.engineRebuilt) rows.push(`<div class="row">${TICONS.engine}<span>Rebuilt engine</span></div>`);
   if (t.transmission) rows.push(`<div class="row">${TICONS.gear}<span>${esc(t.transmission)}</span></div>`);
+  if (t.apu) rows.push(`<div class="row">${TICONS.apu}<span>APU equipped</span></div>`);
   if (t.location) rows.push(`<div class="row">${TICONS.pin}<span>${esc(t.location)}</span></div>`);
   const coming = !!t.comingSoon || String(t.status||'').toLowerCase()==='coming soon';
   const soon = coming || !!t.hold || String(t.status||'').toLowerCase()==='available soon';
